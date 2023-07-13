@@ -14,7 +14,6 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.nozbe.watermelondb.utils.MigrationSet;
 import com.nozbe.watermelondb.utils.Schema;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;

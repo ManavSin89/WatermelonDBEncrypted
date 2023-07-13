@@ -2,9 +2,10 @@ package com.nozbe.watermelondb;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteDatabase;
-
+//import android.database.sqlite.SQLiteCursor;
+//import android.database.sqlite.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteCursor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +52,8 @@ public class WMDatabase {
             // On some systems there is some kind of lock on `/databases` folder ¯\_(ツ)_/¯
             path = context.getDatabasePath("" + name + ".db").getPath().replace("/databases", "");
         }
-        return SQLiteDatabase.openDatabase(path, null, openFlags);
+        System.loadLibrary("sqlcipher");
+        return SQLiteDatabase.openDatabase(path, "awesomePass",null, openFlags,null);
     }
 
     public void setUserVersion(int version) {
@@ -149,12 +151,14 @@ public class WMDatabase {
     private ArrayList<String> getAllTables() {
         ArrayList<String> allTables = new ArrayList<>();
         try (Cursor cursor = rawQuery(Queries.select_tables)) {
-            cursor.moveToFirst();
-            int nameIndex = cursor.getColumnIndex("name");
-            if (nameIndex > -1) {
-                do {
-                    allTables.add(cursor.getString(nameIndex));
-                } while (cursor.moveToNext());
+            if(cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int nameIndex = cursor.getColumnIndex("name");
+                if (nameIndex > -1) {
+                    do {
+                        allTables.add(cursor.getString(nameIndex));
+                    } while (cursor.moveToNext());
+                }
             }
         }
         return allTables;
