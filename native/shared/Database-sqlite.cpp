@@ -1,5 +1,4 @@
 #include "Database.h"
-
 // TODO: The split between Database-sqlite.cpp and Sqlite.cpp is confusing…
 // Maybe we should either just merge them?
 // Or create another layer of abstraction for JSI-capable SQlite, but without Watermelon-specific logic?
@@ -8,7 +7,7 @@ namespace watermelondb {
 using platform::consoleError;
 using platform::consoleLog;
 
-sqlite3_stmt* Database::prepareQuery(std::string sql) {
+sqlite3_stmt *Database::prepareQuery(std::string sql) {
     sqlite3_stmt *statement = cachedStatements_[sql];
 
     if (statement == nullptr) {
@@ -79,18 +78,19 @@ std::string Database::bindArgsAndReturnId(sqlite3_stmt *statement, simdjson::ond
 
         if (type == ondemand::json_type::string) {
             std::string_view stringView = arg;
-            bindResult = sqlite3_bind_text(statement, i + 1, stringView.data(), (int) stringView.length(), SQLITE_STATIC);
+            bindResult = sqlite3_bind_text(statement, i + 1, stringView.data(), (int)stringView.length(), SQLITE_STATIC);
             if (i == 0) {
                 returnId = std::string(stringView);
             }
         } else if (type == ondemand::json_type::number) {
-            bindResult = sqlite3_bind_double(statement, i + 1, (double) arg);
+            bindResult = sqlite3_bind_double(statement, i + 1, (double)arg);
         } else if (type == ondemand::json_type::boolean) {
-            bindResult = sqlite3_bind_int(statement, i + 1, (bool) arg);
+            bindResult = sqlite3_bind_int(statement, i + 1, (bool)arg);
         } else if (type == ondemand::json_type::null) {
             bindResult = sqlite3_bind_null(statement, i + 1);
         } else {
-            throw jsi::JSError(rt, "Invalid argument type for query - only strings, numbers, booleans and null are allowed");
+            throw jsi::JSError(rt, "Invalid argument type for query - only strings, numbers, booleans and null are "
+                                   "allowed");
         }
 
         i++;
@@ -199,7 +199,8 @@ jsi::Object Database::resultDictionary(sqlite3_stmt *statement) {
         } else if (type == SQLITE_NULL) {
             dictionary.setProperty(rt, column, jsi::Value::null());
         } else {
-            throw jsi::JSError(rt, "Unable to fetch record from database - unknown column type (WatermelonDB does not support blobs or custom sqlite types");
+            throw jsi::JSError(rt, "Unable to fetch record from database - unknown column type (WatermelonDB does not "
+                                   "support blobs or custom sqlite types");
         }
     }
 
@@ -230,7 +231,8 @@ jsi::Array Database::resultArray(sqlite3_stmt *statement) {
         } else if (type == SQLITE_NULL) {
             result.setValueAtIndex(rt, i, jsi::Value::null());
         } else {
-            throw jsi::JSError(rt, "Unable to fetch record from database - unknown column type (WatermelonDB does not support blobs or custom sqlite types");
+            throw jsi::JSError(rt, "Unable to fetch record from database - unknown column type (WatermelonDB does not "
+                                   "support blobs or custom sqlite types");
         }
     }
 
@@ -301,4 +303,4 @@ void Database::setUserVersion(int newVersion) {
     executeUpdate(sql);
 }
 
-}
+} // namespace watermelondb

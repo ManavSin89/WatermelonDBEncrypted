@@ -1,8 +1,7 @@
 #pragma once
 
-#include <string>
 #include "Database.h"
-
+#include <string>
 namespace watermelondb {
 namespace platform {
 

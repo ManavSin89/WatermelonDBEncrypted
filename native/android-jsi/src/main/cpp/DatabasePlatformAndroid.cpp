@@ -1,15 +1,14 @@
+#include "sqlite3cipher.h"
 #include <android/log.h>
+#include <cassert>
 #include <mutex>
 #include <unordered_map>
-#include <sqlite3.h>
-#include <cassert>
 
 #include "DatabasePlatform.h"
 #include "DatabasePlatformAndroid.h"
 
 #define LOG_TAG "watermelondb.jsi"
 #define SQLITE_LOG_TAG "watermelondb.sqlite"
-
 namespace watermelondb {
 namespace platform {
 
@@ -160,7 +159,7 @@ void provideJson(int id, jbyteArray array) {
         return;
     }
 
-    jbyte* bytes = env->GetByteArrayElements(array, NULL);
+    jbyte *bytes = env->GetByteArrayElements(array, NULL);
     jsize length = env->GetArrayLength(array);
     jbyteArray arrayGlobalRef = static_cast<jbyteArray>(env->NewGlobalRef(array));
 
@@ -177,7 +176,7 @@ std::string_view getSyncJson(int id) {
     }
 
     auto json = jsonSearch->second;
-    std::string_view view((char *) json.bytes, json.length);
+    std::string_view view((char *)json.bytes, json.length);
     return view;
 }
 

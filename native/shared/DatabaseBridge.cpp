@@ -187,7 +187,7 @@ void Database::install(jsi::Runtime *runtime) {
         });
         createMethod(rt, adapter, "unsafeLoadFromSync", 4, [database](jsi::Runtime &rt, const jsi::Value *args) {
             assert(database->initialized_);
-            auto jsonId = (int) args[0].getNumber();
+            auto jsonId = (int)args[0].getNumber();
             auto schema = args[1].getObject(rt);
             auto preamble = args[2].getString(rt).utf8(rt);
             auto postamble = args[3].getString(rt).utf8(rt);
@@ -228,4 +228,3 @@ void Database::install(jsi::Runtime *runtime) {
 
 
 } // namespace watermelondb
-

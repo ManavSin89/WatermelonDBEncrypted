@@ -1,6 +1,5 @@
 #include "Database.h"
 #include "DatabasePlatform.h"
-
 namespace watermelondb {
 
 using platform::consoleError;
@@ -175,4 +174,4 @@ jsi::Value Database::getLocal(jsi::String &key) {
     return jsi::String::createFromUtf8(rt, text);
 }
 
-}
+} // namespace watermelondb

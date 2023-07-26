@@ -1,6 +1,9 @@
 #include "Sqlite.h"
 #include "DatabasePlatform.h"
+#include "cipher.h"
+#include "sqlite3cipher.h"
 #include <cassert>
+
 
 namespace watermelondb {
 
@@ -20,9 +23,9 @@ std::string resolveDatabasePath(std::string path) {
 SqliteDb::SqliteDb(std::string path) {
     consoleLog("Will open database...");
     platform::initializeSqlite();
-    #ifndef ANDROID
+#ifndef ANDROID
     assert(sqlite3_threadsafe());
-    #endif
+#endif
 
     auto resolvedPath = resolveDatabasePath(path);
     int openResult = sqlite3_open(resolvedPath.c_str(), &sqlite);
@@ -35,6 +38,12 @@ SqliteDb::SqliteDb(std::string path) {
             // whoa, sqlite couldn't allocate memory
             throw new std::runtime_error("Error while trying to open database, sqlite is null - " + std::to_string(openResult));
         }
+    }
+    int keyRes = sqlite3_key(sqlite, "test", 4);
+    if (sqlite3_exec(sqlite, "SELECT count(*) FROM sqlite_master;", NULL, NULL, NULL) == SQLITE_OK) {
+        consoleLog("Key is correct");
+    } else {
+        consoleLog("Key is incorrect");
     }
     assert(sqlite != nullptr);
 

@@ -1,5 +1,4 @@
 #pragma once
-
 namespace watermelondb {
 
 using platform::consoleError;
@@ -11,16 +10,16 @@ jsi::Value makeError(facebook::jsi::Runtime &rt, const std::string &desc) {
 
 jsi::Value runBlock(facebook::jsi::Runtime &rt, std::function<jsi::Value(void)> block) {
     jsi::Value retValue;
-    // NOTE: C++ Exceptions don't work correctly on Android -- most likely due to the fact that
-    // we don't share the C++ stdlib with React Native targets, which means that the executor
-    // doesn't know how to catch our exceptions to turn them into JS errors. As a workaround,
-    // we catch those ourselves and return JS Errors instead of throwing them in JS VM.
-    // See also:
-    // https://github.com/facebook/hermes/issues/422 - REA also catches all exceptions in C++
-    //    but then passes them to Java world via JNI
-    // https://github.com/facebook/hermes/issues/298#issuecomment-661352050
-    // https://github.com/facebook/react-native/issues/29558
-    #ifdef ANDROID
+// NOTE: C++ Exceptions don't work correctly on Android -- most likely due to the fact that
+// we don't share the C++ stdlib with React Native targets, which means that the executor
+// doesn't know how to catch our exceptions to turn them into JS errors. As a workaround,
+// we catch those ourselves and return JS Errors instead of throwing them in JS VM.
+// See also:
+// https://github.com/facebook/hermes/issues/422 - REA also catches all exceptions in C++
+//    but then passes them to Java world via JNI
+// https://github.com/facebook/hermes/issues/298#issuecomment-661352050
+// https://github.com/facebook/react-native/issues/29558
+#ifdef ANDROID
     try {
         retValue = block();
     } catch (const jsi::JSError &error) {
@@ -33,9 +32,9 @@ jsi::Value runBlock(facebook::jsi::Runtime &rt, std::function<jsi::Value(void)> 
         std::string exceptionString("Exception in HostFunction: <unknown>");
         retValue = makeError(rt, exceptionString);
     }
-    #else
+#else
     retValue = block();
-    #endif
+#endif
     return retValue;
 }
 
@@ -43,22 +42,20 @@ using jsiFunction = std::function<jsi::Value(jsi::Runtime &rt, const jsi::Value 
 
 void createMethod(jsi::Runtime &runtime, jsi::Object &object, const char *methodName, unsigned int argCount, jsiFunction func) {
     jsi::PropNameID name = jsi::PropNameID::forAscii(runtime, methodName);
-    jsi::Function function = jsi::Function::createFromHostFunction(runtime, name, argCount, [methodName, argCount, func]
-                                                                   (jsi::Runtime &rt, const jsi::Value &, const jsi::Value *args, size_t count) {
+    jsi::Function function = jsi::Function::createFromHostFunction(
+    runtime, name, argCount, [methodName, argCount, func](jsi::Runtime &rt, const jsi::Value &, const jsi::Value *args, size_t count) {
         if (count != argCount) {
             std::string error = std::string(methodName) + " takes " + std::to_string(argCount) + " arguments";
-            #ifdef ANDROID
+#ifdef ANDROID
             consoleError(error);
             std::abort();
-            #else
+#else
             throw std::invalid_argument(error);
-            #endif
+#endif
         }
-        return runBlock(rt, [&]() {
-            return func(rt, args);
-        });
+        return runBlock(rt, [&]() { return func(rt, args); });
     });
     object.setProperty(runtime, name, function);
 }
 
-}
+} // namespace watermelondb

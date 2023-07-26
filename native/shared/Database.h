@@ -1,10 +1,10 @@
 #pragma once
 
+#import "sqlite3cipher.h"
 #import <jsi/jsi.h>
+#import <mutex>
 #import <unordered_map>
 #import <unordered_set>
-#import <mutex>
-#import <sqlite3.h>
 
 // FIXME: Make these paths consistent across platforms
 #ifdef ANDROID
@@ -14,15 +14,15 @@
 #import <simdjson/simdjson.h>
 #endif
 
-#import "Sqlite.h"
 #import "DatabasePlatform.h"
+#import "Sqlite.h"
 
 using namespace facebook;
 
 namespace watermelondb {
 
 class Database : public jsi::HostObject {
-public:
+    public:
     static void install(jsi::Runtime *runtime);
     Database(jsi::Runtime *runtime, std::string path, bool usesExclusiveLocking);
     ~Database();
@@ -41,7 +41,7 @@ public:
     jsi::Value getLocal(jsi::String &key);
     void executeMultiple(std::string sql);
 
-private:
+    private:
     bool initialized_;
     bool isDestroyed_;
     std::mutex mutex_;
@@ -53,7 +53,7 @@ private:
     jsi::Runtime &getRt();
     jsi::JSError dbError(std::string description);
 
-    sqlite3_stmt* prepareQuery(std::string sql);
+    sqlite3_stmt *prepareQuery(std::string sql);
     void bindArgs(sqlite3_stmt *statement, jsi::Array &arguments);
     std::string bindArgsAndReturnId(sqlite3_stmt *statement, simdjson::ondemand::array &args);
     SqliteStatement executeQuery(std::string sql, jsi::Array &arguments);

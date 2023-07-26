@@ -1,5 +1,4 @@
 #include "Database.h"
-
 namespace watermelondb {
 
 using platform::consoleError;
@@ -34,4 +33,4 @@ jsi::Array Database::arrayFromStd(std::vector<jsi::Value> &vector) {
     return array;
 }
 
-}
+} // namespace watermelondb

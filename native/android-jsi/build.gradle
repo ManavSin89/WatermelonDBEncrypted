@@ -11,7 +11,9 @@ android {
     compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
     buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
     ndkVersion rootProject.hasProperty('ndkVersion') ? rootProject.ndkVersion : DEFAULT_NDK_VERSION
-
+    buildFeatures {
+        prefab true
+    }
     defaultConfig {
         minSdkVersion rootProject.hasProperty('minSdkVersion') ? rootProject.minSdkVersion : DEFAULT_MIN_SDK_VERSION
         targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
@@ -31,7 +33,8 @@ android {
                 //   libc++_shared.so (std::__ndk1::locale::use_facet(std::__ndk1::locale::id&) const+212)
                 //   libwatermelondb-jsi.so (std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>::operator<<(long long)+124)
                 //   libwatermelondb-jsi.so (std::__ndk1::basic_string<char, watermelondb::to_json_string<simdjson::fallback::ondemand::value&>::char_traits<char>, watermelondb::to_json_string<simdjson::fallback::ondemand::value&>::allocator<char>> watermelondb::to_json_string<simdjson::fallback::ondemand::value&>(simdjson::fallback::ondemand::value&&&)+3486)
-                // arguments "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_STL=c++_shared"
+                cFlags "-DSQLITE_HAS_CODEC", "-DSQLITE_TEMP_STORE=2"
             }
         }
     }
@@ -51,4 +54,5 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.facebook.react:react-native:+'
+    implementation 'com.android.ndk.thirdparty:openssl:1.1.1l-beta-1'
 }

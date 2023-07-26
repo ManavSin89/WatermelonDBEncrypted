@@ -4,7 +4,6 @@
 
 #include "Database.h"
 #include "DatabasePlatformAndroid.h"
-
 using namespace facebook;
 
 extern "C" JNIEXPORT void JNICALL Java_com_nozbe_watermelondb_jsi_JSIInstaller_installBinding(JNIEnv *env, jobject thiz, jlong runtimePtr) {

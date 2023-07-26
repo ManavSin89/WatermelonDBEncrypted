@@ -1,5 +1,4 @@
 #include "Database.h"
-
 namespace watermelondb {
 
 using platform::consoleError;
@@ -37,7 +36,6 @@ void Database::batch(jsi::Array &operations) {
                     }
                 }
             }
-
         }
         commit();
     } catch (const std::exception &ex) {
@@ -81,10 +79,10 @@ void Database::batchJSON(jsi::String &&jsiJson) {
                     cacheBehavior = field;
                 } else if (fieldIdx == 1) {
                     if (cacheBehavior != 0) {
-                        table = (std::string_view) field;
+                        table = (std::string_view)field;
                     }
                 } else if (fieldIdx == 2) {
-                    sql = (std::string_view) field;
+                    sql = (std::string_view)field;
                 } else if (fieldIdx == 3) {
                     ondemand::array argsBatches = field;
                     auto stmt = prepareQuery(sql);
@@ -121,4 +119,4 @@ void Database::batchJSON(jsi::String &&jsiJson) {
     }
 }
 
-}
+} // namespace watermelondb

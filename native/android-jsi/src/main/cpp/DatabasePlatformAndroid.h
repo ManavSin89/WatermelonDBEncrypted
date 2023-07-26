@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jni.h>
-
 namespace watermelondb {
 namespace platform {
 

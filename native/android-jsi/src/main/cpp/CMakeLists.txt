@@ -37,7 +37,7 @@ set(SQLITE_VERSION sqlite-amalgamation-3400100)
 
 include_directories(
         ../../../../shared
-        ${NODE_MODULES_PATH_WM}/@nozbe/sqlite/${SQLITE_VERSION}/
+        # ${NODE_MODULES_PATH_WM}/@nozbe/sqlite/${SQLITE_VERSION}/
         ${NODE_MODULES_PATH_WM}/@nozbe/simdjson/src/
         ${NODE_MODULES_PATH_RN}/react-native/React
         ${NODE_MODULES_PATH_RN}/react-native/React/Base
@@ -53,16 +53,19 @@ include_directories(
 # -------------------------------------------------
 # Build configuration
 
-#add_definitions(
-#        -DFOLLY_USE_LIBCPP=1
-#        -DFOLLY_NO_CONFIG=1
-#        -DFOLLY_HAVE_MEMRCHR=1
-#)
+add_definitions(
+       -DSQLITE_HAS_CODEC=1
+        -DSQLITE_TEMP_STORE=2
+)
 
 # simdjson is slow without optimization
 set(CMAKE_CXX_FLAGS_DEBUG "-Os") # comment out for JSI debugging
 set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+# set(CMAKE_C_FLAGS "-DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2") # comment out for JSI debugging
+# set(CMAKE_C_FLAGS_DEBUG "-DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2") # comment out for JSI debugging
+# set(CMAKE_C_FLAGS_REALSE "-DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2") # comment out for JSI debugging
 
+message(${CMAKE_C_FLAGS})
 # TODO: Configure sqlite with compile-time options
 # https://www.sqlite.org/compile.html
 
@@ -70,11 +73,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "-Os")
 # Source files
 
 file(GLOB ANDROID_JSI_SRC_FILES ./*.cpp)
-file(GLOB SHARED_SRC_FILES ../../../../shared/*.cpp)
+file(GLOB SHARED_SRC_FILES ../../../../shared/*)
 
 add_library(watermelondb-jsi SHARED
         # vendor files
-        ${NODE_MODULES_PATH_WM}/@nozbe/sqlite/${SQLITE_VERSION}/sqlite3.c
+        # ${NODE_MODULES_PATH_WM}/@nozbe/sqlite/${SQLITE_VERSION}/sqlite3.c
         ${NODE_MODULES_PATH_WM}/@nozbe/simdjson/src/simdjson.cpp
         # our sources
         ${ANDROID_JSI_SRC_FILES}
@@ -83,7 +86,13 @@ add_library(watermelondb-jsi SHARED
         # seems wrong to compile a file that's already getting compiled as part of the app, but ¯\_(ツ)_/¯
         ${NODE_MODULES_PATH_RN}/react-native/ReactCommon/jsi/jsi/jsi.cpp)
 
+
+find_package(openssl REQUIRED CONFIG)
+
 target_link_libraries(watermelondb-jsi
                       # link with these libraries:
                       android
-                      log)
+                      log
+                      openssl::crypto
+                      openssl::ssl
+                      )
