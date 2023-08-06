@@ -33,7 +33,6 @@ const getComparisonRight = (table: TableName<any>, comparisonRight: ComparisonRi
   } else if (comparisonRight.column) {
     return `"${table}"."${comparisonRight.column}"`
   }
-
   return typeof comparisonRight.value !== 'undefined' ? encodeValue(comparisonRight.value) : 'null'
 }
 
@@ -121,10 +120,17 @@ const encodeWhereCondition = (
     const ftsColumn = `"${left}"`
     const matchValue = getComparisonRight(table, comparison.right)
     const ftsTableColumn = table === left ? `${ftsTable}` : `${ftsTable}.${ftsColumn}`
+    // first we remove the quotes from the escaped string
+    const formattedMatchValue = matchValue.substr(1, matchValue.length - 2)
+    // than we split the string in to words by spaces to prepare for fts query
+    const splittedMatchValue = formattedMatchValue.split(' ')
+    // than we wrap each word with double quotes and join them with spaces
+    const formattedSplittedMatchValue = splittedMatchValue.map((value) => `"${value}"`).join(' ')
+    // all info about sqlite fts query can be found here: https://www.sqlite.org/fts5.html#full_text_query_syntax
     return (
       `${srcTable}.${rowid} in (` +
       `select ${ftsTable}.${rowid} from ${ftsTable} ` +
-      `where ${ftsTableColumn} match ${matchValue}` +
+      `where ${ftsTableColumn} match '${formattedSplittedMatchValue}'` +
       `)`
     )
   }
